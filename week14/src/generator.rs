@@ -8,50 +8,54 @@
 use rand::Rng;
 
 /// Generates a random password of the given `length`.
-///
-/// The character set is:
-///   - Always included: lowercase letters (a–z), uppercase letters (A–Z), digits (0–9)
-///   - Included when `use_symbols` is true: `!@#$%^&*`
-///
-/// Each character is chosen independently at random.
-/// Panics if `length` is 0.
-///
-/// # Examples
-/// ```
-/// let pwd = generate_random(12, false);
-/// assert_eq!(pwd.len(), 12);
-/// ```
-pub fn generate_random(_length: usize, _use_symbols: bool) -> String {
-    todo!("Implement generate_random — hint: build a charset string then pick random chars from it using rand::thread_rng()")
+pub fn generate_random(length: usize, use_symbols: bool) -> String {
+    if length == 0 {
+        panic!("Length must be greater than 0");
+    }
+
+    let mut charset =
+        String::from("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+    if use_symbols {
+        charset.push_str("!@#$%^&*");
+    }
+
+    let mut rng = rand::thread_rng();
+    let charset_bytes = charset.as_bytes();
+
+    (0..length)
+        .map(|_| {
+            let idx = rng.gen_range(0..charset_bytes.len());
+            charset_bytes[idx] as char
+        })
+        .collect()
 }
 
 /// Generates a passphrase made of `word_count` random common English words joined by `separator`.
-///
-/// Use the WORD_LIST constant defined below as your word source.
-/// Each word is selected independently at random.
-///
-/// # Examples
-/// ```
-/// let phrase = generate_passphrase(3, '-');
-/// // e.g. "apple-river-cloud"
-/// assert_eq!(phrase.split('-').count(), 3);
-/// ```
-pub fn generate_passphrase(_word_count: usize, _separator: char) -> String {
-    todo!("Implement generate_passphrase — hint: pick random indices into WORD_LIST, join with separator.to_string()")
+pub fn generate_passphrase(word_count: usize, separator: char) -> String {
+    let mut rng = rand::thread_rng();
+    let mut words = Vec::new();
+
+    for _ in 0..word_count {
+        let idx = rng.gen_range(0..WORD_LIST.len());
+        words.push(WORD_LIST[idx]);
+    }
+
+    words.join(&separator.to_string())
 }
 
 /// Generates a numeric PIN of the given `length` (digits 0–9 only).
-///
-/// Panics if `length` is 0.
-///
-/// # Examples
-/// ```
-/// let pin = generate_pin(6);
-/// assert_eq!(pin.len(), 6);
-/// assert!(pin.chars().all(|c| c.is_ascii_digit()));
-/// ```
-pub fn generate_pin(_length: usize) -> String {
-    todo!("Implement generate_pin — hint: sample from '0'..='9'")
+pub fn generate_pin(length: usize) -> String {
+    if length == 0 {
+        panic!("Length must be greater than 0");
+    }
+
+    let mut rng = rand::thread_rng();
+    (0..length)
+        .map(|_| {
+            let digit = rng.gen_range(0..10);
+            char::from_digit(digit, 10).unwrap()
+        })
+        .collect()
 }
 
 // A small word list for passphrases.

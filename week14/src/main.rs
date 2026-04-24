@@ -17,7 +17,7 @@ use generator::{generate_passphrase, generate_pin, generate_random};
 use validator::{calculate_entropy, check_common_patterns, validate_strength};
 
 // ============================================================================
-// CLI DEFINITION — fill in the argument fields marked with todo comments
+// CLI DEFINITION
 // ============================================================================
 
 /// A password generator CLI.
@@ -67,32 +67,43 @@ enum Commands {
 }
 
 // ============================================================================
-// MAIN — implement the match arms below
+// MAIN — Implementation
 // ============================================================================
 fn main() {
     let cli = Cli::parse();
 
     match cli.command {
         Commands::Random { length, symbols } => {
-            // TODO: call generate_random(length, symbols) and print the result
-            // Bonus: also print the entropy using calculate_entropy()
-            todo!("Handle the `random` subcommand")
+            let password = generate_random(length, symbols);
+            let entropy = calculate_entropy(&password);
+            println!("Generated Random Password: {}", password);
+            println!("Entropy: {:.2} bits", entropy);
         }
 
         Commands::Passphrase { words, separator } => {
-            // TODO: call generate_passphrase(words, separator) and print the result
-            todo!("Handle the `passphrase` subcommand")
+            let phrase = generate_passphrase(words, separator);
+            println!("Generated Passphrase: {}", phrase);
         }
 
         Commands::Pin { length } => {
-            // TODO: call generate_pin(length) and print the result
-            todo!("Handle the `pin` subcommand")
+            let pin = generate_pin(length);
+            println!("Generated PIN: {}", pin);
         }
 
         Commands::Validate { password } => {
-            // TODO: call validate_strength(&password) and check_common_patterns(&password)
-            // Print the strength and warn if a common pattern is detected
-            todo!("Handle the `validate` subcommand")
+            let strength = validate_strength(&password);
+            let is_common = check_common_patterns(&password);
+            let entropy = calculate_entropy(&password);
+
+            println!("Analysis for: \"{}\"", password);
+            println!("Strength: {}", strength);
+            println!("Entropy: {:.2} bits", entropy);
+
+            if is_common {
+                println!("WARNING: This password matches a common weak pattern!");
+            } else {
+                println!("No common weak patterns detected.");
+            }
         }
     }
 }
